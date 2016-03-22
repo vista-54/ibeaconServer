@@ -1,0 +1,32 @@
+<div class="ModalWindowCurrentEvent">
+    <button onclick="closeModal()">Closed</button>
+    <button name="addItem">Add Item</button>
+    <h1>Items List <span name="date"></span></h1>
+    <ul class="ilist">
+
+    </ul>
+    <div class="addItem">
+        <div class="ItemInfo">
+            <input name="ItemName" placeholder="Name of Item">
+            <input name="ItemDate" readonly hidden>
+            <input name="ItemTime" type="time">
+            <input name="place_id" hidden>
+            <input name="place_name" readonly placeholder="place name">
+            <input name="Itemlink" type="text" placeholder="Item's link">
+            <input name="itemId" type="text" hidden>
+
+            <div>
+                <span name="SaveSuccess" class="AddedSuccess">Your Item successfull added!</span>
+                <span name="SaveError" class="AddedError">Error</span>
+            </div>
+
+            <button name="saveItem">Save Item</button>
+        </div>
+        <div class="localMaps" id="map" style="width: 500px;height: 500px">
+
+        </div>
+    </div>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-A3pAC0iRrTZGPVHZV-i1XPDSISU_NEA&callback=initMap">
+    </script>
+</div>
