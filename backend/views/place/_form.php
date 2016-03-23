@@ -9,7 +9,8 @@ use yii\widgets\ActiveForm;
 ?>
 
 <div class="place-form">
-    <input name="locationId" value="<?=$model->location?>" hidden>
+    <input name="locationId" value="<?= $model->location ?>" hidden>
+
     <div id="gmaps" style="height: 500px;width: 100%">
         This is google maps
     </div>
@@ -35,19 +36,21 @@ use yii\widgets\ActiveForm;
     ]); ?>
 
 <!--    --><?//= $form->field($model, 'location')->textInput() ?>
+    <?= $form->field($model, 'id')->textInput()->hiddenInput()->label(false) ?>
+    <!--    --><? //= $form->field($model, 'location')->textInput() ?>
 
     <?= $form->field($model, 'name')->textarea(['rows' => 1]) ?>
 
-    <?= $form->field($model, 'crd_north')->textInput(['maxlength' => true,'readonly' => true]) ?>
+    <?= $form->field($model, 'crd_north')->textInput(['maxlength' => true, 'readonly' => true]) ?>
 
-    <?= $form->field($model, 'crd_south')->textInput(['maxlength' => true,'readonly' => true]) ?>
+    <?= $form->field($model, 'crd_south')->textInput(['maxlength' => true, 'readonly' => true]) ?>
 
     <?= $form->field($model, 'crd_east')->textInput(['maxlength' => true, 'readonly' => true]) ?>
 
     <?= $form->field($model, 'crd_west')->textInput(['maxlength' => true, 'readonly' => true]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Save' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

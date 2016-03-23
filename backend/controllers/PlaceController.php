@@ -64,16 +64,17 @@ class PlaceController extends Controller
     public function actionCreate($id)
     {
 
-//    var_dump($id);
+        $placeId=Yii::$app->request->post()['Place']['id'];
+//    var_dump($placeId);
 //        $id=Yii::$app->request->post('id');
 ////            var_dump($id);
-//        if ($id !== '') {
-//            $model = $this->findModel($id);
+        if ($placeId !== null&&$placeId !== '') {
+            $model = $this->findModel($placeId);
 //
-//        } else {
+        } else {
             $model = new Place();
 
-//        }
+        }
         $model->location = $id;
 //        var_dump($id !== '');
 
@@ -111,11 +112,12 @@ class PlaceController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete()
     {
+        $id=Yii::$app->request->post('id');
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+//        return $this->redirect(['index']);
     }
 
     public function actionGetLocation()

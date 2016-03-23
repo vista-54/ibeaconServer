@@ -79,23 +79,39 @@ class Location extends \yii\db\ActiveRecord
     {
         $path = Yii::getAlias('@backend/web/');
         $folder = 'maps';
+        $templates = '/templates/';
         $dir = $path . $folder . "/$this->tmpName";
         $counter = 1;
-        for ($z = 0; $z < 4; $z++) {
+        for ($z = 0; $z < 2; $z++) {
             if ($z === 0) {
                 $counter = 1;
             } else {
                 $counter = $counter * 2;
             }
+            $newZoom = $z + 4;
             for ($i = 0; $i < $counter; $i++) {
                 for ($j = 0; $j < $counter; $j++) {
-                    $dirTmp = $path . $folder . "/$eventId" . "/$z" . "/$i";
+                    $dirTmp = $path . $folder . "/$eventId" . "/$newZoom";
                     $image = Yii::$app->image->load($dir);
                     $image->resize(256 * $counter, 256 * $counter);
                     BaseFileHelper::createDirectory($dirTmp, 509, true);
+                    $src = $path . $folder . $templates . ($z + 4);
+                    BaseFileHelper::copyDirectory($src, $dirTmp);
                     $image->crop(256, 256, $i * 256, $j * 256);
-                    $b = $counter - $j - 1;
-                    $image->save($dirTmp . "/$b" . ".jpg");
+//                    $b = $counter - $j - 1;
+//                    $b = $newZoom *2;
+
+                    //m8 I could create better, but my brain didn't support me
+                    if($z===0){
+//                        BaseFileHelper::createDirectory($dirTmp, 509, true);
+//                        BaseFileHelper::findFiles()
+                        $image->save($dirTmp . "/8". "/8" . ".jpg");
+                    }else if($z===1){
+                        $k=16+$i;
+                        $m=17-$j;
+                        $image->save($dirTmp . "/$k". "/$m" . ".jpg");
+                    }
+
                 }
 
             }

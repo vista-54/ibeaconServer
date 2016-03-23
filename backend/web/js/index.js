@@ -8,10 +8,10 @@ function initBtns() {
         initCount++;
 //                   alert('click');
         var bounds = {
-            north: 0.0002,
-            south: -0.0002,
-            east: 0.0002,
-            west: -0.0002
+            north: 30.0002,
+            south: 29.0002,
+            east: 30.0002,
+            west: 29.0002
         };
 
         var infowindow = new google.maps.InfoWindow({});
@@ -141,14 +141,14 @@ function getPlaces(id) {
         console.log(result);
         return result;
     });
-        //var obj = JSON.parse(result);
-        //$('input[name=locationId]').val(obj.id);
-        //$('input[name=eventId]').val(obj.event_id);
-        //$('input[name=name]').val(obj.name);
-        //$('input[name=north]').val(obj.crd_north);
-        //$('input[name=south]').val(obj.crd_south);
-        //$('input[name=east]').val(obj.crd_east);
-        //$('input[name=west]').val(obj.crd_west);
+    //var obj = JSON.parse(result);
+    //$('input[name=locationId]').val(obj.id);
+    //$('input[name=eventId]').val(obj.event_id);
+    //$('input[name=name]').val(obj.name);
+    //$('input[name=north]').val(obj.crd_north);
+    //$('input[name=south]').val(obj.crd_south);
+    //$('input[name=east]').val(obj.crd_east);
+    //$('input[name=west]').val(obj.crd_west);
 
 }
 
@@ -160,10 +160,10 @@ function initMap() {
         $('.placeForm').show();
         $('button[name=addPlace]').hide();
         var bounds = {
-            north: 0.0002,
-            south: -0.0002,
-            east: 0.0002,
-            west: -0.0002
+            north: 15.0002,
+            south: 10.0002,
+            east: 15.0002,
+            west: 10.0002
         };
         var infowindow = new google.maps.InfoWindow({});
         rectangle = new google.maps.Rectangle({
@@ -171,7 +171,7 @@ function initMap() {
             editable: true,
             draggable: true,
             optimized: false,
-            html: 'Click right button mouse for edit location'
+            //html: 'Click right button mouse for edit location'
         });
         rectangle.addListener('bounds_changed', showNewRect);
         rectangle.setMap(map);
@@ -282,9 +282,12 @@ function initMap() {
     //var maplink = window.localStorage.getItem('mapLink');
     //var eventName = window.localStorage.getItem('eventName');
     //var evId = $('input[name=eventId]').val();
-    var locId=$('input[name=locationId]').val();
+    var locId = $('input[name=locationId]').val();
+    var tmrl = 'http://ibeaconserver/backend/web/maps/templates/bg.jpg';
+
     var iBeacons = new google.maps.ImageMapType({
         /*Get tile url in the backend*/
+
 
         getTileUrl: function (coord, zoom) {
             var normalizedCoord = getNormalizedCoord(coord, zoom);
@@ -292,19 +295,43 @@ function initMap() {
                 return null;
             }
 //                map is bound
-            var params={
-                cache:false
+            var params = {
+                cache: false
             };
-
+            var res = '';
+            var obj = {};
             var bound = Math.pow(2, zoom);
-            console.log('http://ibeaconserver/backend/web/maps/' + 30 + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg');
-            return 'http://ibeaconserver/backend/web/maps/' + 30 + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg';
+            switch (zoom) {
+                case 4:
+                    if ((normalizedCoord.x === 8) && ((bound - normalizedCoord.y - 1) === 8)) {
+                        res = 'http://ibeaconserver/backend/web/maps/' + locId + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg';
+                    }
+                    else {
+                        res = tmrl;
+                    }
+                    ;
+                    break;
+                case 5:
+                    if (((normalizedCoord.x === 16) && ((bound - normalizedCoord.y - 1) === 16)) || ((normalizedCoord.x === 16) && ((bound - normalizedCoord.y - 1) === 17)) || ((normalizedCoord.x === 17) && ((bound - normalizedCoord.y - 1) === 16)) || ((normalizedCoord.x === 17) && ((bound - normalizedCoord.y - 1) === 17))) {
+                        res = 'http://ibeaconserver/backend/web/maps/' + locId + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg';
+                    }
+                    else {
+                        res = tmrl;
+                    }
+                    break;
+            }
+
+
+            console.log('http://ibeaconserver/backend/web/maps/' + locId + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg');
+
+            return res;
+
         },
         /*Tile params*/
         tileSize: new google.maps.Size(256, 256),
         radius: 1738000,
         maxZoom: 5,
-        minZoom: 0,
+        minZoom: 4,
         //radius: 155555,
         optimized: false,
         //name: eventName
@@ -319,69 +346,140 @@ function initMap() {
     var data = {id: location};//id location
     $.post('http://ibeaconserver/backend/place/get-location', data, function (result) {//get location in DB
         console.log(JSON.parse(result));
-        var res=JSON.parse(result);
-        for(var i in res){
-            var obj=res[i];
+        var res = JSON.parse(result);
+        for (var i in res) {
+            var obj = res[i];
             var bounds = {
                 north: parseFloat(obj.crd_north),
                 south: parseFloat(obj.crd_south),
-                east:parseFloat( obj.crd_east),
+                east: parseFloat(obj.crd_east),
                 west: parseFloat(obj.crd_west)
             };
+
             rectangle = new google.maps.Rectangle({
                 bounds: bounds,
                 editable: false,
                 draggable: false,
                 optimized: false,
-                html: 'Click right button mouse for edit location',
-                name:obj.name
+                rectId: obj.id,
+                html: '<nav><button name="EditLoc" >Edit</button><br><button name="DeleteLoc">Delete</button>',
+                name: obj.name,
+                /*   editRect:function(){
+                 $('.placeForm').show();
+                 $('button[name=addPlace]').hide();
+                 $('textarea[name="Place[name]"]').val(this.name);
+                 $('input[name="Place[crd_north]"]').val(this.bounds.R.j);
+                 $('input[name="Place[crd_south]"]').val(this.bounds.R.R);
+                 $('input[name="Place[crd_east]"]').val(this.bounds.j.R);
+                 $('input[name="Place[crd_west]"]').val(this.bounds.j.j);
+                 this.editable = true; //enable edit
+                 this.editable_changed(function () {
+                 return true;
+                 });
+                 this.draggable_changed(function () {
+                 return true;
+                 });
+                 this.draggable = true; //enable change position
+                 }*/
                 //rectId:obj.id
             });
-            rectangle.addListener('mouseover', function () {
-                if (EditOn) {
-                    return false;
-                }
-                infowindow.setContent(this.html);
-                infowindow.setPosition(this.getBounds().getNorthEast());
-                if (!this.editable) {
-                    infowindow.open(map, this);
-                }
-                console.log('hover');
-            });
-            rectangle.addListener('mouseout', function () {
-                infowindow.close();
-            });
-            var EditOn=false;
+
+
+            //rectangle.addListener('mouseover', function () {
+            //    if (EditOn) {
+            //        return false;
+            //    }
+            //    infowindow.setContent(this.html);
+            //    infowindow.setPosition(this.getBounds().getNorthEast());
+            //    if (!this.editable) {
+            //        infowindow.open(map, this);
+            //    }
+            //    console.log('hover');
+            //});
+            //rectangle.addListener('mouseout', function () {
+            //    infowindow.close();
+            //});
+            var EditOn = false;
+            var mode = 'create';
             /*Edit Locations*/
             rectangle.addListener('rightclick', function () {
+                var CurrRect = this;
                 if (EditOn) {
                     return false;
                 }
-                EditOn = true;
 
-                $('.placeForm').show();
-                $('button[name=addPlace]').hide();
-                $('textarea[name="Place[name]"]').val(this.name);
-                $('input[name="Place[crd_north]"]').val(this.bounds.R.j);
-                $('input[name="Place[crd_south]"]').val(this.bounds.R.R);
-                $('input[name="Place[crd_east]"]').val(this.bounds.j.R);
-                $('input[name="Place[crd_west]"]').val(this.bounds.j.j);
-                this.editable = true; //enable edit
-                this.editable_changed(function () {
-                    return true;
+                infowindow.setContent(this.html);
+                infowindow.setPosition(this.getBounds().getNorthEast());
+                infowindow.open(map, this);
+                $('button[name=EditLoc]').click(function () {
+                    //mode = 'update';
+                    infowindow.close();
+                    EditOn = true;
+                    //console.log(this.bounds);
+                    //console.log("Edit");
+                    //window.location = "http://ibeaconserver/backend/place/update/" + rectangle.rectId;
+                    //window.onload = function () {
+                    $('.placeForm').show();
+                    $('button[name=addPlace]').hide();
+                    $('input[name="Place[id]"]').val(CurrRect.rectId);
+                    $('textarea[name="Place[name]"]').val(CurrRect.name);
+                    $('input[name="Place[crd_north]"]').val(CurrRect.bounds.R.j);
+                    $('input[name="Place[crd_south]"]').val(CurrRect.bounds.R.R);
+                    $('input[name="Place[crd_east]"]').val(CurrRect.bounds.j.R);
+                    $('input[name="Place[crd_west]"]').val(CurrRect.bounds.j.j);
+
+                    CurrRect.editable = true; //enable edit
+                    CurrRect.editable_changed(function () {
+                        return true;
+                    });
+                    CurrRect.draggable_changed(function () {
+                        return true;
+                    });
+                    CurrRect.draggable = true; //enable change position
+                    //}
+
+
                 });
-                this.draggable_changed(function () {
-                    return true;
+
+                $('button[name=DeleteLoc]').click(function () {
+                    //var confirm=  confirm("Are you serious?");
+                    //alert(confirm);
+                    console.log(CurrRect.rectId);
+                    var data={id:CurrRect.rectId};
+
+                    //data.
+                    $.post('http://ibeaconserver/backend/place/delete',data,function(result){
+                        console.log(result);
+                        window.location.reload();
+                    })
                 });
-                this.draggable = true; //enable change position
-                console.log(this.bounds);
+
+
+                //
+                //$('.placeForm').show();
+                //$('button[name=addPlace]').hide();
+                //$('textarea[name="Place[name]"]').val(this.name);
+                //$('input[name="Place[crd_north]"]').val(this.bounds.R.j);
+                //$('input[name="Place[crd_south]"]').val(this.bounds.R.R);
+                //$('input[name="Place[crd_east]"]').val(this.bounds.j.R);
+                //$('input[name="Place[crd_west]"]').val(this.bounds.j.j);
+                //this.editable = true; //enable edit
+                //this.editable_changed(function () {
+                //    return true;
+                //});
+                //this.draggable_changed(function () {
+                //    return true;
+                //});
+                //this.draggable = true; //enable change position
+                //console.log(this.bounds);
+
                 //getLocations(rectId);
             });
             rectangle.addListener('bounds_changed', showNewRect);
             function showNewRect() {
                 var ne = rectangle.getBounds().getNorthEast();
                 var sw = rectangle.getBounds().getSouthWest();
-                var name=rectangle.name;
+                var name = rectangle.name;
                 var neP = (ne + "").split(',');
                 var swP = (sw + "").split(',');
                 var north = neP[0].replace('(', '');
@@ -397,6 +495,7 @@ function initMap() {
                 $('input[name="Place[crd_east]"]').val(east);
                 $('input[name="Place[crd_west]"]').val(west);
             }
+
             rectangle.setMap(map);
         }
 
@@ -452,7 +551,7 @@ function openModalWindowOfDate(date) {
         console.log(result);
 
         /*Template Load Modal Window */
-        $('.ModalView').load('../../web/templates/tmp.html .ModalWindowCurrentEvent',{cache:false}, function () {
+        $('.ModalView').load('../../web/templates/tmp.html .ModalWindowCurrentEvent', {cache: false}, function () {
             var res = JSON.parse(result);
             /*Add ITEM CLICK*/
             $('input[name=ItemDate]').val(date);
@@ -498,9 +597,9 @@ function initLocalMap(result) {
     var locArr = res.Places;
     var map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 0, lng: 0},
-        zoom: 0,
-        maxZoom: 9,
-        minZoom: 0,
+        zoom: 5,
+        maxZoom: 5,
+        minZoom: 4,
         tileSize: new google.maps.Size(256, 256),
         //radius: 155555,
         //optimized:false,
@@ -512,7 +611,8 @@ function initLocalMap(result) {
         draggableCursor: 'default'
 
     });
-    var locId=$('input[name=locationId]').val();
+    var tmrl = 'http://ibeaconserver/backend/web/maps/templates/bg.jpg';
+    var locId = $('input[name=locationId]').val();
     var iBeacons = new google.maps.ImageMapType({
         /*Get tile url in the backend*/
         getTileUrl: function (coord, zoom) {
@@ -522,14 +622,30 @@ function initLocalMap(result) {
             }
 //                map is bound
             var bound = Math.pow(2, zoom);
+            switch (zoom) {
+                case 4:
+                    if ((normalizedCoord.x === 8) && ((bound - normalizedCoord.y - 1) === 8)) {
+                        res = 'http://ibeaconserver/backend/web/maps/' + locId + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg';
+                    }
+                    else {
+                        res = tmrl;
+                    }
+                    ;
+                    break;
+                case 5:
+                    if (((normalizedCoord.x === 16) && ((bound - normalizedCoord.y - 1) === 16)) || ((normalizedCoord.x === 16) && ((bound - normalizedCoord.y - 1) === 17)) || ((normalizedCoord.x === 17) && ((bound - normalizedCoord.y - 1) === 16)) || ((normalizedCoord.x === 17) && ((bound - normalizedCoord.y - 1) === 17))) {
+                        res = 'http://ibeaconserver/backend/web/maps/' + locId + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg';
+                    }
+                    else {
+                        res = tmrl;
+                    }
+                    break;
+            }
 
-            //console.log(res.map.mapImgLink);
 
-            /*Everybody maps consist are many tiles. It's has size 256*256.It's depending about zoom, and coords*/
-            return 'http://ibeaconserver/backend/web/maps/' + locId + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg';
+            console.log('http://ibeaconserver/backend/web/maps/' + locId + '/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpg');
 
-            //return res.map.mapImgLink;
-//                return 'http://beacons.apes-at-work.com/admin/maps/' + zoom + '/' + normalizedCoord.x + '/' + (bound - normalizedCoord.y - 1) + '.jpeg';
+            return res;
         },
         /*not nessessary*/
         tilesloaded: function (e) {
@@ -537,9 +653,9 @@ function initLocalMap(result) {
         },
         /*Tile params*/
         tileSize: new google.maps.Size(256, 256),
-        zoom: 0,
-        maxZoom: 0,
-        minZoom: 0,
+        zoom: 5,
+        maxZoom: 5,
+        minZoom: 4,
         //radius: 155555,
         optimized: false,
         //name: eventName
