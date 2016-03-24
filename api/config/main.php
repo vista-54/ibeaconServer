@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Виталий
- * Date: 24.03.2016
- * Time: 14:32
- */
+
 $params = array_merge(
     require(__DIR__ . '/../../common/config/params.php'),
     require(__DIR__ . '/../../common/config/params-local.php'),
@@ -15,41 +10,36 @@ $params = array_merge(
 return [
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
     'modules' => [
         'v1' => [
             'basePath' => '@app/modules/v1',
-            'class' => 'api\modules\v1\Module'   // here is our v1 modules
+            'class' => 'api\modules\v1\Module'
         ]
     ],
     'components' => [
+        'request' => [
+            'class' => '\yii\web\Request',
+            'enableCookieValidation' => false,
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser'
+            ]
+        ],
         'user' => [
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => false,
+            'enableSession' => false
         ],
-        'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
-        ],
+
         'urlManager' => [
+            'class' => 'yii\web\UrlManager',
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/event'
-//                    'tokens' => [
-//    '{id}' => '<id:\\w+>'
-//]
-                ]
-            ],
+                '<module>/<controller>/<action>' => '<module>/<controller>/<action>'
+            ]
         ]
     ],
-    'params' => $params,
+    'params' => $params
 ];
+
