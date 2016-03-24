@@ -17,8 +17,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Location', ['location/create/'.$id], ['class' => 'btn btn-success']) ?>
-<!--        --><?//= Html::a('Create Location', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Location', ['location/create/' . $id], ['class' => 'btn btn-success']) ?>
+        <!--        --><? //= Html::a('Create Location', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -31,14 +31,21 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
 //            'mapImgLink:ntext',
 
-            ['class' => 'yii\grid\ActionColumn','template'=>'{view}{update}{delete}{buy}','visible'=> true,
-                'buttons'=>[
-                    'buy' =>function ($url, $model, $key)  {
-                        $url= Yii::$app->urlManager->createUrl(['calendar/index','id'=>$model->id]);
+            ['class' => 'yii\grid\ActionColumn', 'template' => '{view}{update}{delete}{items}{beacons}', 'visible' => true,
+                'buttons' => [
+                    'items' => function ($url, $model, $key) {
+                        $url = Yii::$app->urlManager->createUrl(['calendar/index', 'id' => $model->id]);
                         $options = array_merge([
                             'title' => Yii::t('app', 'The items of location'),
                         ]);
                         return Html::a('<span class="glyphicon glyphicon-pushpin"></span>', $url, $options);
+                    },
+                    'beacons' => function ($url, $model, $key) {
+                        $url = Yii::$app->urlManager->createUrl(['beacons/index', 'id' => $model->id]);
+                        $options = array_merge([
+                            'title' => Yii::t('app', 'The beacons of location'),
+                        ]);
+                        return Html::a('<span class="glyphicon glyphicon-tree-conifer"></span>', $url, $options);
                     },
 
 
