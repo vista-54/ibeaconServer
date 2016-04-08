@@ -5,10 +5,15 @@ namespace backend\controllers;
 use Yii;
 use backend\models\Event;
 use backend\models\EventSearch;
+use yii\data\ArrayDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use yii\filters\AccessControl;
+use common\models\EventUser;
+use common\models\User;
+use common\models\EventUserSearch;
+use yii\data\ActiveDataProvider;
 /**
  * EventController implements the CRUD actions for Event model.
  */
@@ -17,6 +22,35 @@ class EventController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'actions' => ['index'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'actions' => ['view','create', 'update', 'delete'],
+                        'allow' => true,
+                        'roles' => ['superAdmin'],
+                    ],
+                    [
+                        'actions' => ['view',],
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -32,6 +66,24 @@ class EventController extends Controller
      */
     public function actionIndex()
     {
+
+        //check you role and views aviable events
+        if (Yii::$app->user->identity->role == User::ROLE_ADMIN) {
+            $userId = Yii::$app->request->get('id');
+            $events=EventUser::find()->select('event_id')->where(['user_id'=>$userId])->asArray()->all();
+            $AllowEvents=array();
+            foreach($events as $item){
+                $currEvent=Event::find()->where(['id'=>$item['event_id']])->one();
+                array_push($AllowEvents,$currEvent);
+            }
+            $searchModel = new EventSearch();
+            $dataProvider = new ArrayDataProvider(['allModels'=>$AllowEvents]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+        //if you superAdmin views all events
         $searchModel = new EventSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -39,14 +91,10 @@ class EventController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+
+
     }
-    public function actionLocation($id){
-//    var_dump("hello");
-        return $this->redirect(array('location/create', 'id' => $id));
-//        return $this->render('view', [
-//            'model' => $this->findModel($id),
-//        ]);
-    }
+
     /**
      * Displays a single Event model.
      * @param integer $id
@@ -75,9 +123,11 @@ class EventController extends Controller
                 'model' => $model,
             ]);
         }
+    }
 
-
-
+    public function actionLocation($id)
+    {
+        return $this->redirect(array('location/create', 'id' => $id));
     }
 
     /**

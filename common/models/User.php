@@ -21,11 +21,14 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property string $password write-only password
  */
+
 class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
-
+    const ROLE_SUPERADMIN=20;
+    const ROLE_ADMIN=5;
+//    public $role;
     /**
      * @inheritdoc
      */
@@ -68,7 +71,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+       return self::findOne(['auth_key' => $token ]);
     }
 
     /**

@@ -2,10 +2,10 @@
 
 namespace backend\controllers;
 
-use backend\models\Location;
+use common\models\Location;
 use Yii;
-use backend\models\Place;
-use backend\models\PlaceSearch;
+use common\models\Place;
+use common\models\PlaceSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;

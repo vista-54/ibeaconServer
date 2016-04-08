@@ -445,10 +445,10 @@ function initMap() {
                     //var confirm=  confirm("Are you serious?");
                     //alert(confirm);
                     console.log(CurrRect.rectId);
-                    var data={id:CurrRect.rectId};
+                    var data = {id: CurrRect.rectId};
 
                     //data.
-                    $.post('http://ibeaconserver/backend/place/delete',data,function(result){
+                    $.post('http://ibeaconserver/backend/place/delete', data, function (result) {
                         console.log(result);
                         window.location.reload();
                     })
@@ -662,6 +662,7 @@ function initLocalMap(result) {
     });
     map.mapTypes.set('iBeacons', iBeacons);
     map.setMapTypeId('iBeacons');
+
     for (var i in locArr) {
         var obj = locArr[i];
         var bounds = {
@@ -764,7 +765,7 @@ function edit(id) {
 
 
 }
-function editBeaconMap(id){
+function editBeaconMap(id) {
     var map = new google.maps.Map(document.getElementById('iBmaps'), {
         center: {lat: 0, lng: 0},
         zoom: 5,
@@ -780,6 +781,15 @@ function editBeaconMap(id){
         },
         draggableCursor: 'default'
 
+    });
+    map.addListener('mouseover', function (e) {
+        console.log(e);
+        var marker = new google.maps.Marker({
+            position: e.latLng,
+            map: map,
+
+        });
+        console.log('hover');
     });
     var tmrl = 'http://ibeaconserver/backend/web/maps/templates/bg.jpg';
     var locId = id;
@@ -832,6 +842,50 @@ function editBeaconMap(id){
     });
     map.mapTypes.set('iBeacons', iBeacons);
     map.setMapTypeId('iBeacons');
-    console.log(data);
+    //console.log(data);
 
+}
+
+function AddMarkerToMap() {
+    var ball = document.getElementById('beacon');
+
+    ball.onmousedown = function (e) { // 1. отследить нажатие
+
+        // подготовить к перемещению
+        // 2. разместить на том же месте, но в абсолютных координатах
+        ball.style.position = 'absolute';
+        moveAt(e);
+        var map = document.getElementById('mapParent');
+        // переместим в body, чтобы мяч был точно не внутри position:relative
+        //map.appendChild(ball);
+        document.body.appendChild(ball);
+
+        ball.style.zIndex = 1000; // показывать мяч над другими элементами
+
+
+        // и сдвинуть на половину ширины/высоты для центрирования
+        function moveAt(e) {
+            ball.style.left = e.pageX - ball.offsetWidth / 2 + 'px';
+            ball.style.top = e.pageY - ball.offsetHeight / 2 + 'px';
+            console.log(e.layerX);
+        }
+
+        // 3, перемещать по экрану
+        document.onmousemove = function (e) {
+            moveAt(e);
+        }
+
+        // 4. отследить окончание переноса
+        ball.onmouseup = function () {
+            document.onmousemove = null;
+            ball.onmouseup = null;
+        }
+    }
+}
+function modalLoad(){
+    $('.modalButton').click(function () {
+        $('#modal').modal('show')
+            .find('#modalContent')
+            .load($(this).attr('value'));
+    })
 }

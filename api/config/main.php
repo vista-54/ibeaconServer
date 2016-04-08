@@ -14,6 +14,10 @@ return [
         'v1' => [
             'basePath' => '@app/modules/v1',
             'class' => 'api\modules\v1\Module'
+        ],
+        'mobilev1' => [
+            'basePath' => '@app/modules/mobilev1',
+            'class' => 'api\modules\mobilev1\Module'
         ]
     ],
     'components' => [
@@ -25,6 +29,7 @@ return [
             ]
         ],
         'user' => [
+
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => false,
             'enableSession' => false
@@ -38,7 +43,16 @@ return [
             'rules' => [
                 '<module>/<controller>/<action>' => '<module>/<controller>/<action>'
             ]
-        ]
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'defaultRoles' => ['superAdmin','admin'],
+            'itemFile' => '@common/components/rbac/items.php',
+            'assignmentFile' => '@common/components/rbac/assignments.php',
+            'ruleFile' => '@common/components/rbac/rules.php'
+        ],
+
+
     ],
     'params' => $params
 ];

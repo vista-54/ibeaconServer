@@ -4,8 +4,8 @@ namespace backend\controllers;
 
 use backend\models\Event;
 use Yii;
-use backend\models\Location;
-use backend\models\LocationSearch;
+use common\models\Location;
+use common\models\LocationSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -68,27 +68,10 @@ class LocationController extends Controller
     public function actionCreate($id)
     {
 
-//        $id=Yii::$app->request->post();
-//        var_dump(Yii::$app->requ/est->post());
         $model = new Location();
-
-//        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-//            return $this->redirect(['view', 'id' => $model->id]);
-//        } else {
-//            return $this->render('create', [
-//                'model' => $model,
-//            ]);
-//        }
-//        $model = new Event();
-
-//        $ih = new CImageHandler(); //Инициализация
-
-//        var_dump(Yii::$app->request->post());
-        //if post request we upload image
         if (Yii::$app->request->isPost) {
             $model->mapImage = UploadedFile::getInstance($model, 'mapImage');
             if ($model->upload()) {
-                // file is uploaded successfully
                 return;
             }
         }

@@ -9,6 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use common\widgets\Alert;
+use common\models\User;
 
 AppAsset::register($this);
 ?>
@@ -34,13 +35,20 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    $menuItems = [
-    ['label' => 'Home', 'url' => ['/site/index']],
+    $menuItems  []=['label' => 'Home', 'url' => ['/site/index']];
+
 //        ['label' => 'Create map', 'url' => ['/location/index']],
-        ['label' => 'Create event', 'url' => ['/event/index']],
+
+           if (Yii::$app->user->identity->role == User::ROLE_SUPERADMIN) {
+               $menuItems[]=  ['label' => 'Create event', 'url' => ['/event/index']];
+           };
+           if (Yii::$app->user->identity->role == User::ROLE_ADMIN) {
+               $menuItems[]=  ['label' => 'My events', 'url' => ['/event/index/'.Yii::$app->user->id]];
+           };
+
 //        ['label' => 'Items list', 'url' => ['calendar/index']],
 
-    ];
+
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
